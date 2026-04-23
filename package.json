@@ -1,0 +1,12 @@
+{
+  "name": "manpower-portal-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Manpower portal app with mobile OTP login and role-based dashboards",
+  "dependencies": {
+    "pg": "^8.12.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

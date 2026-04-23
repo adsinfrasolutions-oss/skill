@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKILL</title>
+  <meta name="theme-color" content="#d3692d" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="SKILL" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <aside class="hero-panel">
+      <div class="brand-pill">SKILL</div>
+      <h1>Smart manpower control room for workers, clients, and live field movement.</h1>
+      <p>
+        A faster mobile-first experience for staffing, wage matching, project tracking, and micro-level map visibility.
+      </p>
+
+      <div class="hero-signal">
+        <div>
+          <span>Built For</span>
+          <strong>Field teams and non-technical users</strong>
+        </div>
+        <div>
+          <span>Core Focus</span>
+          <strong>Hire faster, track cleaner, act quicker</strong>
+        </div>
+      </div>
+
+      <div class="highlight-grid">
+        <article>
+          <span>01</span>
+          <h2>Mobile-first auth</h2>
+          <p>Role + mobile number + OTP verification instead of password-based login.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Separate dashboards</h2>
+          <p>Each role sees its own modules, workers list, and tracking controls.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Location aware</h2>
+          <p>Workers and clients can push live GPS position from a mobile browser.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h2>AI wage help</h2>
+          <p>Simple wage suggestions, shift matching, and offer acceptance make deals easier for both sides.</p>
+        </article>
+      </div>
+    </aside>
+
+    <main class="workspace-panel">
+      <section class="command-strip">
+        <div class="command-copy">
+          <p class="eyebrow">Operations</p>
+          <h2>Fast actions, clean signals, less confusion</h2>
+          <p class="muted">The interface now prioritizes live actions first, details second, and micro-location insight when you need it.</p>
+        </div>
+        <div class="command-tags">
+          <span>Realtime</span>
+          <span>Collapsible map</span>
+          <span>Wage matching</span>
+          <span>Mobile ready</span>
+        </div>
+      </section>
+
+      <section class="top-card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Authentication</p>
+            <h2>Login with mobile number</h2>
+            <p class="muted">Choose role, enter mobile number, get OTP, then login.</p>
+          </div>
+        </div>
+
+        <div id="authBanner" class="banner info">System ready.</div>
+        <div class="mini-note">Simple steps: 1. Choose role 2. Enter mobile number 3. Get OTP 4. Enter OTP and login</div>
+
+        <div class="auth-grid">
+          <form id="requestOtpForm" class="card-lite">
+            <label>
+              <span>Select role</span>
+              <select id="loginRole" required></select>
+            </label>
+            <label>
+              <span>Mobile number</span>
+              <input id="loginMobile" type="tel" inputmode="numeric" placeholder="Enter 10-digit mobile number" required />
+            </label>
+            <button type="submit" class="primary-btn">Get OTP</button>
+          </form>
+
+          <form id="verifyOtpForm" class="card-lite">
+            <label>
+              <span>OTP</span>
+              <input id="otpCode" type="text" inputmode="numeric" placeholder="Enter 6-digit OTP" required />
+            </label>
+            <div id="otpHint" class="mini-note"></div>
+            <button type="submit" class="primary-btn">Login</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h2 id="dashboardTitle">Login with mobile OTP to continue</h2>
+            <p id="dashboardSubtitle" class="muted">Each role gets a separate dashboard, permissions, and location visibility.</p>
+          </div>
+          <button id="logoutButton" class="ghost-btn">Logout</button>
+        </div>
+
+        <div id="sessionPanel" class="session-grid" hidden></div>
+        <div id="summaryCards" class="summary-cards"></div>
+        <div id="dashboardCards" class="dashboard-grid"></div>
+      </section>
+
+      <section class="card map-card" id="mapCard">
+        <div class="section-head map-head">
+          <div>
+            <p class="eyebrow">Live Map</p>
+            <h2>Expandable micro-view map</h2>
+            <p class="muted">Yellow dots are workers. Red dots are clients. Blue dots are project sites.</p>
+          </div>
+          <div class="map-shell-actions">
+            <button id="mapCollapseButton" class="ghost-btn" type="button">Collapse</button>
+            <button id="mapExpandButton" class="primary-btn" type="button">Expand map</button>
+          </div>
+        </div>
+        <div class="map-console">
+          <div class="map-legend">
+            <span><i class="legend-dot worker-dot"></i> Worker</span>
+            <span><i class="legend-dot client-dot"></i> Client</span>
+            <span><i class="legend-dot project-dot"></i> Project Site</span>
+          </div>
+          <div class="map-toolbar">
+            <button id="mapZoomOut" class="map-tool-btn" type="button" aria-label="Zoom out">-</button>
+            <label class="map-zoom-readout">
+              <span>Zoom</span>
+              <input id="mapZoomRange" type="range" min="100" max="400" step="10" value="100" />
+            </label>
+            <button id="mapZoomIn" class="map-tool-btn" type="button" aria-label="Zoom in">+</button>
+            <button id="mapResetButton" class="ghost-btn" type="button">Reset view</button>
+            <button id="projectPinModeButton" class="ghost-btn" type="button">Pick project pin</button>
+          </div>
+        </div>
+        <div class="map-stage-wrap">
+          <div id="mobileMap" class="mobile-map">
+            <div id="mapViewport" class="map-viewport">
+              <div class="map-grid"></div>
+              <div id="mapDots" class="map-dots"></div>
+            </div>
+          </div>
+          <aside class="map-detail-panel">
+            <p class="eyebrow">Map Focus</p>
+            <h3 id="mapFocusTitle">Tap a dot</h3>
+            <p id="mapFocusMeta" class="muted">Select any worker, client, or project to see location detail.</p>
+            <div id="mapFocusStats" class="focus-stats"></div>
+            <div class="mini-note">Pinch is not required. Use zoom, expand, and tap for a cleaner micro-level view.</div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="card registration-hub">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Registration Hub</p>
+            <h2>Select class of person first</h2>
+            <p class="muted">The right registration format will open automatically after class selection.</p>
+          </div>
+        </div>
+        <div class="mini-note">Simple flow: choose class of person, then fill only that matching registration page.</div>
+        <div class="registration-switcher">
+          <label class="registration-picker">
+            <span>Class of person</span>
+            <select id="registrationClass">
+              <option value="WORKER">Worker / Skilled manpower</option>
+              <option value="ENGINEER">Educated person / Engineer / Staff</option>
+            </select>
+          </label>
+        </div>
+        <div class="smart-registration-grid">
+          <article class="smart-guide-card">
+            <p class="eyebrow">Smart Guide</p>
+            <h3 id="registrationGuideTitle">Worker registration</h3>
+            <p id="registrationGuideText" class="muted">This form is best for skilled manpower, helpers, operators, and field workers.</p>
+            <div id="registrationChecklist" class="smart-checklist"></div>
+          </article>
+          <article class="smart-guide-card">
+            <p class="eyebrow">Live Readiness</p>
+            <h3>Before you submit</h3>
+            <div id="registrationReadiness" class="smart-readiness"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="two-column registration-section" id="workerRegistrationSection">
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Worker Onboarding</p>
+              <h2>Register worker</h2>
+            </div>
+          </div>
+          <div class="mini-note">Fill simple details. Select work type first, then choose skill.</div>
+          <form id="workerForm" class="form-grid">
+            <div class="smart-form-block full-span">
+              <div class="smart-form-head">
+                <p class="eyebrow">Step 1</p>
+                <h3>Basic identity</h3>
+              </div>
+              <div class="form-grid">
+                <label>
+                  <span>Worker full name</span>
+                  <input id="workerName" type="text" required />
+                </label>
+                <label>
+                  <span>Mobile number</span>
+                  <input id="workerPhone" type="tel" required />
+                </label>
+                <label>
+                  <span>Email address</span>
+                  <input id="workerEmail" type="email" />
+                </label>
+                <label>
+                  <span>City</span>
+                  <input id="workerCity" type="text" required />
+                </label>
+              </div>
+            </div>
+            <div class="smart-form-block full-span">
+              <div class="smart-form-head">
+                <p class="eyebrow">Step 2</p>
+                <h3>Work profile</h3>
+              </div>
+              <div class="form-grid">
+                <label>
+                  <span>Industry category</span>
+                  <select id="workerIndustry" required></select>
+                </label>
+                <label>
+                  <span>Skill</span>
+                  <select id="workerSkill" required></select>
+                </label>
+                <label>
+                  <span>Experience</span>
+                  <select id="workerExperience" required>
+                    <option value="">Select experience</option>
+                    <option value="0-1 Years">0-1 Years</option>
+                    <option value="1-3 Years">1-3 Years</option>
+                    <option value="3-5 Years">3-5 Years</option>
+                    <option value="5-10 Years">5-10 Years</option>
+                    <option value="10+ Years">10+ Years</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Availability</span>
+                  <select id="workerAvailability" required>
+                    <option value="">Select availability</option>
+                    <option value="Immediate">Immediate</option>
+                    <option value="Within 7 Days">Within 7 Days</option>
+                    <option value="Within 15 Days">Within 15 Days</option>
+                    <option value="Part Time">Part Time</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="smart-form-block full-span">
+              <div class="smart-form-head">
+                <p class="eyebrow">Step 3</p>
+                <h3>Visibility and wages</h3>
+              </div>
+              <div class="form-grid">
+                <label>
+                  <span>Visibility on app</span>
+                  <select id="workerVisibility" required>
+                    <option value="VISIBLE">Visible to clients</option>
+                    <option value="HIDDEN">Hide from clients</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Duty preference</span>
+                  <select id="workerShiftPreference" required>
+                    <option value="DAY">Day only</option>
+                    <option value="NIGHT">Night only</option>
+                    <option value="BOTH">Day and night</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Preferred day wage</span>
+                  <input id="workerPreferredDayWage" type="number" min="0" step="1" placeholder="Enter day wage" required />
+                </label>
+                <label>
+                  <span>Preferred night wage</span>
+                  <input id="workerPreferredNightWage" type="number" min="0" step="1" placeholder="Enter night wage" required />
+                </label>
+                <label>
+                  <span>Wage flexibility</span>
+                  <select id="workerWageFlexibility" required>
+                    <option value="NEGOTIABLE">Negotiable</option>
+                    <option value="FIXED">Fixed rate</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="smart-form-block full-span">
+              <div class="smart-form-head">
+                <p class="eyebrow">Step 4</p>
+                <h3>Extra notes</h3>
+              </div>
+              <label class="full-span">
+                <span>Profile notes</span>
+                <textarea id="workerNotes" rows="4"></textarea>
+              </label>
+            </div>
+            <button type="submit" class="primary-btn full-span">Register worker</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Mobile Location</p>
+              <h2>Share location</h2>
+            </div>
+          </div>
+          <div class="stack-list">
+            <div class="stack-item">
+              <strong>Worker app</strong>
+              <p>Use mobile geolocation to update current field position during assignment.</p>
+            </div>
+            <div class="stack-item">
+              <strong>Client app</strong>
+              <p>Share project site location so dispatch and admin teams can coordinate manpower faster.</p>
+            </div>
+          </div>
+          <div class="location-box">
+            <button id="locationButton" class="primary-btn">Send my current location</button>
+            <p id="locationStatus" class="muted">Location not sent yet.</p>
+          </div>
+          <div id="trackingFeed" class="tracking-feed"></div>
+        </article>
+      </section>
+
+      <section class="card talent-page registration-section" id="engineerRegistrationSection" hidden>
+        <div class="talent-banner">
+          <div>
+            <p class="eyebrow">Engineer Talent Desk</p>
+            <h2>Educated persons and engineers registration</h2>
+            <p class="muted">A separate professional profile page for diploma holders, graduates, supervisors, and engineers.</p>
+          </div>
+          <div class="talent-badge">Professional Hiring</div>
+        </div>
+        <div class="talent-layout">
+          <article class="talent-info">
+            <div class="stack-item talent-note">
+              <strong>For professional roles</strong>
+              <p>Use this section for site engineers, project coordinators, supervisors, QA/QC engineers, planners, accountants, HR, and office staff.</p>
+            </div>
+            <div class="stack-item talent-note">
+              <strong>Profile details captured</strong>
+              <p>Resume summary, current employer, current salary, expected salary, notice period, education, and specialization are kept separate from worker registration.</p>
+            </div>
+          </article>
+
+          <article class="talent-form-shell">
+            <form id="engineerForm" class="form-grid">
+              <div class="smart-form-block full-span">
+                <div class="smart-form-head">
+                  <p class="eyebrow">Step 1</p>
+                  <h3>Professional identity</h3>
+                </div>
+                <div class="form-grid">
+                  <label>
+                    <span>Full name</span>
+                    <input id="engineerName" type="text" required />
+                  </label>
+                  <label>
+                    <span>Mobile number</span>
+                    <input id="engineerPhone" type="tel" required />
+                  </label>
+                  <label>
+                    <span>Email address</span>
+                    <input id="engineerEmail" type="email" required />
+                  </label>
+                  <label>
+                    <span>Current city</span>
+                    <input id="engineerCity" type="text" required />
+                  </label>
+                </div>
+              </div>
+              <div class="smart-form-block full-span">
+                <div class="smart-form-head">
+                  <p class="eyebrow">Step 2</p>
+                  <h3>Education and role</h3>
+                </div>
+                <div class="form-grid">
+                  <label>
+                    <span>Education level</span>
+                    <select id="engineerEducation" required>
+                      <option value="">Select education</option>
+                      <option value="Diploma">Diploma</option>
+                      <option value="B.Tech / BE">B.Tech / BE</option>
+                      <option value="M.Tech / ME">M.Tech / ME</option>
+                      <option value="MBA">MBA</option>
+                      <option value="B.Sc / B.Com / BA">B.Sc / B.Com / BA</option>
+                      <option value="Other Graduate">Other Graduate</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Field / stream</span>
+                    <select id="engineerField" required>
+                      <option value="">Select field</option>
+                    </select>
+                  </label>
+                  <label id="engineerFieldOtherWrap" hidden>
+                    <span>Other field / stream</span>
+                    <input id="engineerFieldOther" type="text" placeholder="Enter other field / stream" />
+                  </label>
+                  <label>
+                    <span>Role applied</span>
+                    <select id="engineerCategory" required>
+                      <option value="">Select role</option>
+                    </select>
+                  </label>
+                  <label id="engineerCategoryOtherWrap" hidden>
+                    <span>Other role applied</span>
+                    <input id="engineerCategoryOther" type="text" placeholder="Enter other role" />
+                  </label>
+                  <label>
+                    <span>Total experience</span>
+                    <select id="engineerExperience" required>
+                      <option value="">Select experience</option>
+                      <option value="0-1 Years">0-1 Years</option>
+                      <option value="1-3 Years">1-3 Years</option>
+                      <option value="3-5 Years">3-5 Years</option>
+                      <option value="5-10 Years">5-10 Years</option>
+                      <option value="10+ Years">10+ Years</option>
+                    </select>
+                  </label>
+                  <label class="full-span">
+                    <span>Specialization / tools / focus area</span>
+                    <select id="engineerSpecialization" required>
+                      <option value="">Select specialization</option>
+                    </select>
+                  </label>
+                  <label id="engineerSpecializationOtherWrap" class="full-span" hidden>
+                    <span>Other specialization / tools / focus area</span>
+                    <input id="engineerSpecializationOther" type="text" placeholder="Enter other specialization or tool" />
+                  </label>
+                </div>
+              </div>
+              <div class="smart-form-block full-span">
+                <div class="smart-form-head">
+                  <p class="eyebrow">Step 3</p>
+                  <h3>Current job and salary</h3>
+                </div>
+                <div class="form-grid">
+                  <label>
+                    <span>Current employer</span>
+                    <input id="engineerCurrentEmployer" type="text" required />
+                  </label>
+                  <label>
+                    <span>Current designation</span>
+                    <input id="engineerCurrentDesignation" type="text" required />
+                  </label>
+                  <label>
+                    <span>Current salary (monthly)</span>
+                    <input id="engineerCurrentSalary" type="number" min="0" step="1" required />
+                  </label>
+                  <label>
+                    <span>Expected salary (monthly)</span>
+                    <input id="engineerExpectedSalary" type="number" min="0" step="1" required />
+                  </label>
+                  <label>
+                    <span>Notice period</span>
+                    <select id="engineerNoticePeriod" required>
+                      <option value="">Select notice period</option>
+                      <option value="Immediate">Immediate</option>
+                      <option value="15 Days">15 Days</option>
+                      <option value="30 Days">30 Days</option>
+                      <option value="60 Days">60 Days</option>
+                      <option value="90 Days">90 Days</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <div class="smart-form-block full-span">
+                <div class="smart-form-head">
+                  <p class="eyebrow">Step 4</p>
+                  <h3>Resume summary</h3>
+                </div>
+                <label class="full-span">
+                  <span>Resume file</span>
+                  <input id="engineerResumeFile" type="file" accept=".pdf,.doc,.docx,.txt" />
+                </label>
+                <label class="full-span">
+                  <span>Resume summary</span>
+                  <textarea id="engineerResume" rows="5" placeholder="Paste profile summary, major projects, software knowledge, certifications, and responsibilities." required></textarea>
+                </label>
+              </div>
+              <button type="submit" class="primary-btn full-span">Register professional candidate</button>
+            </form>
+            <div id="engineerStatus" class="mini-note">Use this separate page for professional and educated candidates.</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">AI Assist</p>
+            <h2>Simple suggestions for wages and duty</h2>
+            <p class="muted">Clear words for workers and clients, with easy yes/no actions.</p>
+          </div>
+        </div>
+        <div id="aiInsights" class="stack-list"></div>
+      </section>
+
+      <section class="two-column">
+        <article id="workerPreferencePanel" class="card" hidden>
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Worker Settings</p>
+              <h2>My visibility and wage choice</h2>
+            </div>
+          </div>
+          <div class="mini-note">Worker can go visible or hidden, choose day/night duty, and keep a simple wage choice.</div>
+          <form id="workerPreferenceForm" class="form-grid">
+            <label>
+              <span>Show me on client app</span>
+              <select id="prefVisibility" required>
+                <option value="VISIBLE">Yes, show me</option>
+                <option value="HIDDEN">No, hide me</option>
+              </select>
+            </label>
+            <label>
+              <span>Duty hours</span>
+              <select id="prefShiftPreference" required>
+                <option value="DAY">Day only</option>
+                <option value="NIGHT">Night only</option>
+                <option value="BOTH">Day and night</option>
+              </select>
+            </label>
+            <label>
+              <span>Day wage</span>
+              <input id="prefDayWage" type="number" min="0" step="1" required />
+            </label>
+            <label>
+              <span>Night wage</span>
+              <input id="prefNightWage" type="number" min="0" step="1" required />
+            </label>
+                <label>
+                  <span>Rate type</span>
+                  <select id="prefWageFlexibility" required>
+                    <option value="NEGOTIABLE">Negotiable</option>
+                    <option value="FIXED">Fixed</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Service area in km</span>
+                  <input id="prefServiceRadiusKm" type="number" min="1" max="500" step="1" required />
+                </label>
+                <label>
+                  <span>Duty status</span>
+                  <select id="prefLiveStatus" required>
+                    <option value="AVAILABLE">Available</option>
+                    <option value="OFF_DUTY">Off duty</option>
+              </select>
+            </label>
+            <button type="submit" class="primary-btn full-span">Save my settings</button>
+          </form>
+          <div id="workerPreferenceStatus" class="mini-note">Login as worker to control visibility and wages.</div>
+        </article>
+
+        <article id="clientOfferPanel" class="card" hidden>
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Client Offer</p>
+              <h2>Offer wages to a worker</h2>
+            </div>
+          </div>
+          <div class="mini-note">Client can see worker wage choice and send a clear offer. Deal becomes final only after worker accepts.</div>
+          <form id="clientOfferForm" class="form-grid">
+            <label class="full-span">
+              <span>Select worker</span>
+              <select id="offerWorkerId" required></select>
+            </label>
+            <label>
+              <span>Shift</span>
+              <select id="offerShiftType" required>
+                <option value="DAY">Day</option>
+                <option value="NIGHT">Night</option>
+                <option value="BOTH">Day and night</option>
+              </select>
+            </label>
+            <label>
+              <span>Offer day wage</span>
+              <input id="offerDayWage" type="number" min="0" step="1" required />
+            </label>
+            <label>
+              <span>Offer night wage</span>
+              <input id="offerNightWage" type="number" min="0" step="1" required />
+            </label>
+            <label class="full-span">
+              <span>Offer note</span>
+              <textarea id="offerMessage" rows="3" placeholder="Simple note for worker"></textarea>
+            </label>
+            <button type="submit" class="primary-btn full-span">Send wage offer</button>
+          </form>
+          <div id="clientOfferStatus" class="mini-note">Login as client to send wage offers.</div>
+        </article>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Notifications</p>
+            <h2>Nearby match alerts</h2>
+            <p class="muted">Automatic alerts when a worker and client/project come within the configured service area.</p>
+          </div>
+        </div>
+        <form id="alertPreferenceForm" class="form-grid">
+          <label>
+            <span>Nearby match alerts</span>
+            <select id="alertNearbyEnabled">
+              <option value="true">On</option>
+              <option value="false">Off</option>
+            </select>
+          </label>
+          <div class="full-span action-row">
+            <button type="submit" class="ghost-btn">Save alert preference</button>
+            <span id="alertPreferenceStatus" class="muted">Nearby alerts are on by default.</span>
+          </div>
+        </form>
+        <div id="notificationFeed" class="tracking-feed"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Offers</p>
+            <h2>Open wage deals</h2>
+            <p class="muted">Worker can accept or decline. Accepted offer means the wage deal is final.</p>
+          </div>
+        </div>
+        <div id="offerFeed" class="tracking-feed"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Nearby Match</p>
+            <h2>Auto-match by worker service radius</h2>
+            <p class="muted">Workers can set area in km and nearby clients/projects will see them automatically.</p>
+          </div>
+        </div>
+        <div id="nearbyMatchFeed" class="tracking-feed"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Project Location</p>
+            <h2>Client job location</h2>
+            <p class="muted">Clients can set project location different from mobile location.</p>
+          </div>
+        </div>
+        <div class="mini-note">Select country, state, and district for the work site. This is the job location, not the current phone location.</div>
+        <form id="projectLocationForm" class="form-grid">
+          <label>
+            <span>Country</span>
+            <select id="projectCountry" required></select>
+          </label>
+          <label>
+            <span>State</span>
+            <select id="projectState" required></select>
+          </label>
+          <label>
+            <span>District</span>
+            <select id="projectDistrict" required></select>
+          </label>
+          <label class="full-span">
+            <span>Project name / site name</span>
+            <input id="projectSiteName" type="text" placeholder="Enter site name" required />
+          </label>
+          <label class="full-span">
+            <span>Street address / location of project</span>
+            <input id="projectStreetAddress" type="text" placeholder="Enter street address / site address" required />
+          </label>
+          <label>
+            <span>Project latitude</span>
+            <input id="projectLatitude" type="number" step="0.000001" placeholder="Tap map or enter latitude" />
+          </label>
+          <label>
+            <span>Project longitude</span>
+            <input id="projectLongitude" type="number" step="0.000001" placeholder="Tap map or enter longitude" />
+          </label>
+          <div class="full-span action-row">
+            <button id="projectUseCurrentLocationButton" class="ghost-btn" type="button">Use my current location</button>
+            <span class="muted">For best accuracy, client can tap map or use current phone GPS.</span>
+          </div>
+          <button type="submit" class="primary-btn full-span">Save project location</button>
+        </form>
+        <div id="projectLocationStatus" class="mini-note">No project location saved yet.</div>
+      </section>
+
+      <section id="registryPanel" class="card" hidden>
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Worker Registry</p>
+            <h2>Approved and pending manpower</h2>
+          </div>
+        </div>
+        <div class="form-grid professional-filters">
+          <label>
+            <span>Industry</span>
+            <select id="workerFilterCategory">
+              <option value="">All industries</option>
+            </select>
+          </label>
+          <label>
+            <span>City</span>
+            <input id="workerFilterCity" type="text" placeholder="Search city" />
+          </label>
+          <label>
+            <span>Skill</span>
+            <input id="workerFilterSkill" type="text" placeholder="Search skill" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="workerFilterStatus">
+              <option value="">All statuses</option>
+              <option value="APPROVED">Approved</option>
+              <option value="PENDING">Pending</option>
+              <option value="REJECTED">Rejected</option>
+            </select>
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Worker ID</th>
+                <th>Name</th>
+                <th>Industry</th>
+              <th>Skill</th>
+              <th>City</th>
+              <th>Availability</th>
+              <th>Shift</th>
+              <th>Wages</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+            <tbody id="workerTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="professionalRegistryPanel" class="card" hidden>
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Professional Registry</p>
+            <h2>Educated candidates and engineers</h2>
+            <p class="muted">Separate view for engineers, supervisors, office staff, and professional candidates.</p>
+          </div>
+        </div>
+        <div class="form-grid professional-filters">
+          <label>
+            <span>Education</span>
+            <select id="professionalFilterEducation">
+              <option value="">All education</option>
+            </select>
+          </label>
+          <label>
+            <span>Field / stream</span>
+            <select id="professionalFilterField">
+              <option value="">All fields</option>
+            </select>
+          </label>
+          <label>
+            <span>Role</span>
+            <input id="professionalFilterRole" type="text" placeholder="Search role" />
+          </label>
+          <label>
+            <span>Notice period</span>
+            <select id="professionalFilterNotice">
+              <option value="">All notice periods</option>
+            </select>
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Education</th>
+                <th>Field</th>
+                <th>Role</th>
+                <th>Current Employer</th>
+                <th>Salary</th>
+                <th>Notice</th>
+                <th>Resume</th>
+                <th>Pre Screened</th>
+                <th>Expert Comment</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="professionalTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
