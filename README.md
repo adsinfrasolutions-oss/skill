@@ -91,6 +91,11 @@ Deployment assets for `skill.quantproc.com` are available under `deploy/`, inclu
 - deployment helper script
 - PostgreSQL setup and reseed SQL
 
+For repository-level operating docs, see:
+
+- [DEPLOYMENT.md](DEPLOYMENT.md)
+- [OPERATIONS.md](OPERATIONS.md)
+
 ## Repository notes
 
 - Sensitive runtime files such as `.env`, generated data stores, and logs are ignored
