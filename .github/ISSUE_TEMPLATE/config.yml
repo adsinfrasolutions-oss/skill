@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: SKILL Operations Guide
+    url: https://github.com/adsinfrasolutions-oss/skill/blob/main/OPERATIONS.md
+    about: Check the operations guide before opening production-related issues.
